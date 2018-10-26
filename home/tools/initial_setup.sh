@@ -7,6 +7,23 @@ set -euo pipefail
 
 # Name of the user to create and grant sudo privileges
 USERNAME=$1
+# SSH Port
+SSH_PORT=$2
+
+# System Update
+apt-get update && apt-get upgrade -y && apt-get autoremove --purge -y && apt-get clean
+
+# Benötigte Tools installieren
+apt-get -y install unattended-upgrades fail2ban ntp ntpdate debconf-utils nano html2text net-tools curl wget ufw git unzip zip htop dnsutils binutils sudo ssh openssh-server rsync
+
+# Deutsche Sprache bereit stellen
+apt-get -y install language-pack-de language-pack-de-base manpages-de
+
+# Bash als Standart Shell
+echo "dash dash/sh boolean false" | debconf-set-selections
+dpkg-reconfigure -f noninteractive dash
+
+
 
 # Whether to copy over the root user's `authorized_keys` file to the new sudo
 # user.
@@ -72,3 +89,6 @@ fi
 # Add exception for SSH and then enable UFW firewall
 ufw allow OpenSSH
 ufw --force enable
+
+# NANO Syntax Highlighting
+wget https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh -qO- | sh
