@@ -23,6 +23,9 @@ apt-get -y install language-pack-de language-pack-de-base manpages-de
 echo "dash dash/sh boolean false" | debconf-set-selections
 dpkg-reconfigure -f noninteractive dash
 
+# NTP-Server aus Deutschland verwenden
+wget -O /etc/ntp.conf https://pagespeedplus.github.io/ubuntu/etc/ntp.conf
+systemctl restart ntp
 
 
 # Whether to copy over the root user's `authorized_keys` file to the new sudo
