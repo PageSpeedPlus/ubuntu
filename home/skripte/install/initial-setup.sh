@@ -2,13 +2,28 @@
 set -euo pipefail
 
 ########################
-### SCRIPT VARIABLES ###
+### SKRIPT VARIABLEN ###
 ########################
 
-# Name of the user to create and grant sudo privileges
+# Benutzer mit sudo Privilegien
 USERNAME=$1
 # SSH Port
 SSH_PORT=$2
+
+# Ein/Aus für kopieren der authorized_keys des Root-Benutzers auf den neuen sudo-Benutzer kopieren.
+COPY_AUTHORIZED_KEYS_FROM_ROOT=true
+
+# Additional Zusätzliche öffentliche Schlüssel, die dem neuen sudo-Benutzer hinzugefügt werden sollen.
+# OTHER_PUBLIC_KEYS_TO_ADD=(
+#     "ssh-rsa AAAAB..."
+#     "ssh-rsa AAAAB..."
+# )
+OTHER_PUBLIC_KEYS_TO_ADD=(
+)
+
+#####################
+### SYSTEM KONFIG ###
+#####################
 
 # System Update
 apt-get update && apt-get upgrade -y && apt-get autoremove --purge -y && apt-get clean
@@ -31,25 +46,14 @@ dpkg-reconfigure -f noninteractive dash
 wget -O /etc/ntp.conf https://pagespeedplus.github.io/ubuntu/etc/ntp.conf
 systemctl restart ntp
 
-# Whether to copy over the root user's `authorized_keys` file to the new sudo user.
-COPY_AUTHORIZED_KEYS_FROM_ROOT=true
+###################
+### USER KONFIG ###
+###################
 
-# Additional public keys to add to the new sudo user
-# OTHER_PUBLIC_KEYS_TO_ADD=(
-#     "ssh-rsa AAAAB..."
-#     "ssh-rsa AAAAB..."
-# )
-OTHER_PUBLIC_KEYS_TO_ADD=(
-)
-
-####################
-### SCRIPT LOGIC ###
-####################
-
-# Add sudo user and grant privileges
+# sudo-Benutzer hinzufügen und Berechtigungen vergeben
 useradd --create-home --shell "/bin/bash" --groups sudo "${USERNAME}"
 
-# Check whether the root account has a real password set
+# Überprüfen Sie, ob das Root-Konto ein richtiges Passwort hat.
 encrypted_root_pw="$(grep root /etc/shadow | cut --delimiter=: --fields=2)"
 
 if [ "${encrypted_root_pw}" != "*" ]; then
@@ -57,54 +61,60 @@ if [ "${encrypted_root_pw}" != "*" ]; then
     echo "${USERNAME}:${encrypted_root_pw}" | chpasswd --encrypted
     passwd --lock root
 else
-    # Delete invalid password for user if using keys so that a new password can be set without providing a previous value
+    # Löschen des ungültigen Passwort, wenn Schlüssel verwendet werden. Ein neues Passwort wird beim ersten Login gesetzt.
     passwd --delete "${USERNAME}"
 fi
 
-# Expire the sudo user's password immediately to force a change
+# Verfallen Sie das Passwort des sudo-Benutzers sofort, um eine Änderung zu erzwingen.
 chage --lastday 0 "${USERNAME}"
 
-# Create SSH directory for sudo user
+# SSH-Verzeichnis für sudo-Benutzer erstellen
 home_directory="$(eval echo ~${USERNAME})"
 mkdir --parents "${home_directory}/.ssh"
 
-# Copy `authorized_keys` file from root if requested
+# Kopiere authorized_keys von root
 if [ "${COPY_AUTHORIZED_KEYS_FROM_ROOT}" = true ]; then
     cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
 fi
 
-# Add additional provided public keys
+# Hinzufügen von zusätzlichen bereitgestellten öffentlichen Schlüsseln
 for pub_key in "${OTHER_PUBLIC_KEYS_TO_ADD[@]}"; do
     echo "${pub_key}" >> "${home_directory}/.ssh/authorized_keys"
 done
 
-# Adjust SSH configuration ownership and permissions
+# SSH-Konfigurationseigentum und Berechtigungen anpassen
 chmod 0700 "${home_directory}/.ssh"
 chmod 0600 "${home_directory}/.ssh/authorized_keys"
 chown --recursive "${USERNAME}":"${USERNAME}" "${home_directory}/.ssh"
 
-# Disable root SSH login with password
+# Root-SSH-Anmeldung mit Passwort deaktivieren
 sed --in-place 's/^PermitRootLogin.*/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
 if sshd -t -q; then
     systemctl restart sshd
 fi
 
+################
+### NETZWERK ###
+################
+
 # Ändere SSH Port in /etc/ssh/sshd_config	
 sed -i 's/Port 22/Port "${SSH_PORT}"/' /etc/ssh/sshd_config
 
-# Enable UFW firewall
+# Standart UFW Firewall Regeln
 ufw logging low
 ufw default allow outgoing
 ufw default deny incoming
 
-# Allow SSH Port
+# Öffne SSH Port
 ufw allow "${SSH_PORT}"
 
-# Download ssh_custom_port service Konfigdatei und setzt SSH Port
 # Download fail2ban Jail für ssh_custom_port
+wget -O /etc/fail2ban/jail.d/defaults-debian.conf https://pagespeedplus.github.io/ubuntu/etc/fail2ban/jail.d/defaults-debian.conf
+sed -i 's/port = ssh/port = "${SSH_PORT}"/' /etc/fail2ban/jail.d/defaults-debian.conf
+fail2ban-client reload && systemctl restart fail2ban.service
 
 # NANO Syntax Highlighting
 wget https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh -qO- | sh
 
-# ufw --force enable
-# reboot
+ufw --force enable
+reboot
