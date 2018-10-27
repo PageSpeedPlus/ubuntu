@@ -19,8 +19,9 @@ apt-get -y install cron-apt unattended-upgrades fail2ban ntp ntpdate debconf-uti
 # Deutsche Sprache bereit stellen
 apt-get -y install language-pack-de language-pack-de-base manpages-de
 
-# Configure Automatic security updates
-dpkg-reconfigure unattended-upgrades
+# Automatische Sicherheitsupdates aktivieren
+echo "unattended-upgrades unattended-upgrades/enable_auto_updates boolean true" | debconf-set-selections
+dpkg-reconfigure -f noninteractive unattended-upgrades
 
 # Bash als Standart Shell
 echo "dash dash/sh boolean false" | debconf-set-selections
