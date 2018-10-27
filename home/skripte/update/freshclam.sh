@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # make sure the process is stopped
 /etc/init.d/clamav-freshclam stop
 
