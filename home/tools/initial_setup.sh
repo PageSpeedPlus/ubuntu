@@ -14,10 +14,13 @@ SSH_PORT=$2
 apt-get update && apt-get upgrade -y && apt-get autoremove --purge -y && apt-get clean
 
 # Benötigte Tools installieren
-apt-get -y install unattended-upgrades fail2ban ntp ntpdate debconf-utils nano html2text net-tools curl wget ufw git unzip zip htop dnsutils binutils sudo ssh openssh-server rsync
+apt-get -y install cron-apt unattended-upgrades fail2ban ntp ntpdate debconf-utils nano html2text net-tools curl wget ufw git unzip zip htop dnsutils binutils sudo ssh openssh-server rsync
 
 # Deutsche Sprache bereit stellen
 apt-get -y install language-pack-de language-pack-de-base manpages-de
+
+# Configure Automatic security updates
+dpkg-reconfigure unattended-upgrades
 
 # Bash als Standart Shell
 echo "dash dash/sh boolean false" | debconf-set-selections
