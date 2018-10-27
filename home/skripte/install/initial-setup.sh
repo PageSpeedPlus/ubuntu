@@ -99,7 +99,7 @@ fi
 ################
 
 # Ändere SSH Port in /etc/ssh/sshd_config	
-sed -i 's/Port 22/Port $SSH_PORT/' /etc/ssh/sshd_config
+sed -i 's/#Port 22/Port $SSH_PORT/' /etc/ssh/sshd_config
 
 # Standart UFW Firewall Regeln
 ufw logging low
@@ -107,7 +107,7 @@ ufw default allow outgoing
 ufw default deny incoming
 
 # Öffne SSH Port
-ufw allow $SSH_PORT
+ufw allow $2
 
 # Download fail2ban Jail für ssh_custom_port
 wget -O /etc/fail2ban/jail.d/defaults-debian.conf https://pagespeedplus.github.io/ubuntu/etc/fail2ban/jail.d/defaults-debian.conf
