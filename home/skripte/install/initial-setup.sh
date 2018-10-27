@@ -1,4 +1,5 @@
 #!/bin/bash
+# bash <(wget -qO - https://pagespeedplus.github.io/ubuntu/home/skripte/install/initial-setup.sh) user 22
 set -euo pipefail
 
 ########################
