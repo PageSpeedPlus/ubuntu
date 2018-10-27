@@ -88,7 +88,8 @@ if sshd -t -q; then
     systemctl restart sshd
 fi
 
-# Ändere SSH Port in /etc/ssh/sshd_config
+# Ändere SSH Port in /etc/ssh/sshd_config	
+sed -i 's/Port 22/Port "${SSH_PORT}"/' /etc/ssh/ssh_config
 
 # Enable UFW firewall
 ufw logging low
