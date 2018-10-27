@@ -30,9 +30,7 @@ dpkg-reconfigure -f noninteractive dash
 wget -O /etc/ntp.conf https://pagespeedplus.github.io/ubuntu/etc/ntp.conf
 systemctl restart ntp
 
-
-# Whether to copy over the root user's `authorized_keys` file to the new sudo
-# user.
+# Whether to copy over the root user's `authorized_keys` file to the new sudo user.
 COPY_AUTHORIZED_KEYS_FROM_ROOT=true
 
 # Additional public keys to add to the new sudo user
@@ -54,13 +52,11 @@ useradd --create-home --shell "/bin/bash" --groups sudo "${USERNAME}"
 encrypted_root_pw="$(grep root /etc/shadow | cut --delimiter=: --fields=2)"
 
 if [ "${encrypted_root_pw}" != "*" ]; then
-    # Transfer auto-generated root password to user if present
-    # and lock the root account to password-based access
+    # Transfer auto-generated root password to user if present and lock the root account to password-based access
     echo "${USERNAME}:${encrypted_root_pw}" | chpasswd --encrypted
     passwd --lock root
 else
-    # Delete invalid password for user if using keys so that a new password
-    # can be set without providing a previous value
+    # Delete invalid password for user if using keys so that a new password can be set without providing a previous value
     passwd --delete "${USERNAME}"
 fi
 
@@ -92,9 +88,21 @@ if sshd -t -q; then
     systemctl restart sshd
 fi
 
-# Add exception for SSH and then enable UFW firewall
-ufw allow OpenSSH
-ufw --force enable
+# Ändere SSH Port in /etc/ssh/sshd_config
+
+# Enable UFW firewall
+ufw logging low
+ufw default allow outgoing
+ufw default deny incoming
+
+# Allow SSH Port
+ufw allow "${SSH_PORT}"
+
+# Download ssh_custom_port service Konfigdatei und setzt SSH Port
+# Download fail2ban Jail für ssh_custom_port
 
 # NANO Syntax Highlighting
 wget https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh -qO- | sh
+
+# ufw --force enable
+# reboot
