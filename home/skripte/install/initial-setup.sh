@@ -29,7 +29,7 @@ OTHER_PUBLIC_KEYS_TO_ADD=(
 apt-get update && apt-get upgrade -y && apt-get autoremove --purge -y && apt-get clean
 
 # Benötigte Tools installieren
-apt-get -y install cron-apt unattended-upgrades fail2ban ntp ntpdate debconf-utils nano html2text net-tools curl wget ufw git unzip zip htop dnsutils binutils sudo ssh openssh-server rsync
+apt-get -y install cron-apt unattended-upgrades fail2ban ntp debconf-utils nano html2text net-tools curl wget ufw git htop
 
 # Deutsche Sprache bereit stellen
 apt-get -y install language-pack-de language-pack-de-base manpages-de
