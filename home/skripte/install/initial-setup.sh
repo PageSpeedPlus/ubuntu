@@ -119,3 +119,5 @@ fail2ban-client reload && systemctl restart fail2ban.service
 
 # NANO Syntax Highlighting
 wget https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh -qO- | sh
+
+reboot
