@@ -1,5 +1,5 @@
 #!/bin/bash
-# bash <(wget -qO - https://pagespeedplus.github.io/ubuntu/home/skripte/install/initial-setup.sh) user 22
+# bash <(wget -qO - https://pagespeedplus.github.io/ubuntu/home/skripte/install/initial-setup.sh) user
 set -euo pipefail
 
 ########################
@@ -8,8 +8,6 @@ set -euo pipefail
 
 # Benutzer mit sudo Privilegien
 USERNAME=$1
-# SSH Port
-SSH_PORT=$2
 
 # Ein/Aus für kopieren der authorized_keys des Root-Benutzers auf den neuen sudo-Benutzer kopieren.
 COPY_AUTHORIZED_KEYS_FROM_ROOT=true
@@ -102,16 +100,22 @@ fi
 ufw logging low
 ufw default allow outgoing
 ufw default deny incoming
-
-# Öffne SSH Port
 ufw allow 22
+
+# UFW Firewall aktivieren
+ufw --force enable
+
+################
+### SECURITY ###
+################
 
 # Download fail2ban Jail für ssh_custom_port
 wget -O /etc/fail2ban/jail.d/defaults-debian.conf https://pagespeedplus.github.io/ubuntu/etc/fail2ban/jail.d/defaults-debian.conf
 fail2ban-client reload && systemctl restart fail2ban.service
 
+#################
+### CUSTOMIZE ###
+#################
+
 # NANO Syntax Highlighting
 wget https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh -qO- | sh
-
-ufw --force enable
-reboot
