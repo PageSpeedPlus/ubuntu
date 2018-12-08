@@ -17,6 +17,7 @@ COPY_AUTHORIZED_KEYS_FROM_ROOT=true
 #     "ssh-rsa AAAAB..."
 #     "ssh-rsa AAAAB..."
 # )
+
 OTHER_PUBLIC_KEYS_TO_ADD=(
       "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAB33mYUGa5qOmo4j5I/Gtsg/WOtoPhtZsfm97YHx1FWr3DJAROqWTpxvxdrmDefEQzmLYT7NfyfQGh7wv6LXP/iAwCTR9KP83SIhOEvUOEC/gpTHHucFmlK47suHRGzD/Ye/c9PVBjxbc/s7HYdjQDHoffmT5nbpt7PmBHwnRjogGYqFg=="
 )
