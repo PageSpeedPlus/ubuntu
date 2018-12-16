@@ -30,7 +30,7 @@ OTHER_PUBLIC_KEYS_TO_ADD=(
 apt-get update && apt-get upgrade -y && apt-get autoremove --purge -y && apt-get clean
 
 # Benötigte Tools installieren
-apt-get -y install unattended-upgrades fail2ban ntp debconf-utils nano net-tools curl wget ufw git htop
+apt-get -y install unattended-upgrades fail2ban ntp debconf-utils nano net-tools curl wget ufw git htop unzip
 
 # Deutsche Sprache bereit stellen
 apt-get -y install language-pack-de language-pack-de-base manpages-de
