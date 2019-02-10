@@ -1,0 +1,89 @@
+set daemon 60 #check services ever 60 seconds
+  set logfile /var/log/monit.log
+  set idfile /var/lib/monit/id
+  set statefile /var/lib/monit/state
+
+#Event Queue for 5000 events
+set eventqueue basedir /var/monit slots 100
+
+#Enable Web Access
+set httpd port 2812 address 0.0.0.0  # allow connections on all adapters
+     ssl enable
+     pemfile  /var/certs/monit.pem
+     allow admin:easyengine
+
+# Mail
+# set alert email@address.com with reminder on 15 cycles# set mail-format {
+#   from: monit@wp-bullet.com
+#   reply-to: gmail_username@gmail.com
+#   subject: Monit Alert: $SERVICE - $EVENT
+#   message: $EVENT Service $SERVICE
+#                 Date:        $DATE
+#                 Action:      $ACTION
+#                 Host:        $HOST
+#                 Description: $DESCRIPTION
+#            Your working Robot,
+#            Monit }
+
+# Mailserver (Mailgun oder GMail)
+# set mailserver smtp.mailgun.org port 587
+#                     gmail.com
+#   username "mailadress" password "password"
+#   using tlsv1 with timeout 30 seconds
+
+include /etc/monit/conf.d/*.conf
+
+# The System - Change numbers 2 and 1 in loadavg lines based on number of CPU cores on your system.
+check system $HOST
+    if loadavg (5min) > 2 then alert
+    if loadavg (15min) > 1 then alert
+    if memory usage > 80% for 4 cycles then alert
+    if swap usage > 20% for 4 cycles then alert
+    # Test the user part of CPU usage
+    if cpu usage (user) > 80% for 2 cycles then alert
+    # Test the system part of CPU usage
+    if cpu usage (system) > 20% for 2 cycles then alert
+    # Test the i/o wait part of CPU usage
+    if cpu usage (wait) > 80% for 2 cycles then alert
+    # Test CPU usage including user, system and wait. Note that
+    # multi-core systems can generate 100% per core
+    # so total CPU usage can be more than 100%
+    if cpu usage > 200% for 4 cycles then alert
+    
+check filesystem rootfs with path /
+     if space usage > 80% then alert
+     
+# PHP-FPM
+#check process php5-fpm with pidfile "/var/run/php5-fpm.pid"
+#       if cpu > 80% for 2 cycles then alert
+
+# Cron       
+check process crond with pidfile /var/run/crond.pid
+     group system
+     group crond
+     start program = "/etc/init.d/cron start"
+     stop  program = "/etc/init.d/cron stop"
+     if 5 restarts with 5 cycles then timeout
+     depend cron_bin
+     depend cron_rc
+     depend cron_spool
+     
+check file cron_bin with path /usr/sbin/cron
+     group crond
+     if failed checksum       then unmonitor
+     if failed permission 755 then unmonitor
+     if failed uid root       then unmonitor
+     if failed gid root       then unmonitor
+     
+check file cron_rc with path "/etc/init.d/cron"
+     group crond
+     if failed checksum       then unmonitor
+     if failed permission 755 then unmonitor
+     if failed uid root       then unmonitor
+     if failed gid root       then unmonitor
+    
+check directory cron_spool with path /var/spool/cron/crontabs
+    group crond
+    if failed permission 1730 then unmonitor
+    if failed uid root        then unmonitor
+    if failed gid crontab     then unmonitor
