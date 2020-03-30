@@ -19,7 +19,7 @@ COPY_AUTHORIZED_KEYS_FROM_ROOT=true
 # )
 
 OTHER_PUBLIC_KEYS_TO_ADD=(
-      "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAB33mYUGa5qOmo4j5I/Gtsg/WOtoPhtZsfm97YHx1FWr3DJAROqWTpxvxdrmDefEQzmLYT7NfyfQGh7wv6LXP/iAwCTR9KP83SIhOEvUOEC/gpTHHucFmlK47suHRGzD/Ye/c9PVBjxbc/s7HYdjQDHoffmT5nbpt7PmBHwnRjogGYqFg=="
+      "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAB33mYUGa5qOmo4j5I/Gtsg/WOtoPhtZsfm97YHx1FWr3DJAROqWTpxvxdrmDefEQzmLYT7NfyfQGh7wv6LXP/iAwCTR9KP83SIhOEvUOEC/gpTHHucFmlK47suHRGzD/Ye/c9PVBjxbc/s7HYdjQDHoffmT5nbpt7PmBHecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBADj+tff/XWUx+AOlnIzjnUWf6ARcMmLyhl2IINXTAH6ypCrvmHAAY0jjf2vIKtjY1EygScXO3iH1NEVG4ZFKeFU1QFK63Jz0k4ZhEXo2Sf1vaE3CoXUAP+hl+rhbe9MsOa8kqglcwCXF42v7MSq4oCy4F/+e2HEGDAhTJj/2CpmxaHV6w== ecdsa-key-20200126wnRjogGYqFg=="
 )
 
 #####################
@@ -120,4 +120,4 @@ fail2ban-client reload && systemctl restart fail2ban.service
 #################
 
 # NANO Syntax Highlighting
-wget https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh -qO- | sh
+# wget https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh -qO- | sh
